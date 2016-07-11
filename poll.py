@@ -17,7 +17,7 @@ import jsonschema
 import yaml
 import MySQLdb
 import MySQLdb.cursors
-import libs.db_connections
+from libs.db_connections import DBConnections
 
 
 CHECK_SCHEMA = pathlib.Path(__file__).parent / 'schemas' / 'check.json'
@@ -33,8 +33,9 @@ def poll(config_file, checks_file, output_file):
     database specified in our config.
     """
     checks = load_checks(checks_file)
-    conn = connect_to_db(config_file)
-    results = run_checks(checks, conn)
+    conns = DBConnections(config_file)
+    #conn = connect_to_db(config_file)
+    results = run_checks(checks, conns)
     dump_results(results, output_file)
 
 
@@ -65,16 +66,24 @@ def dump_results(results, output_file):
         print(output, file=ostream)
 
 
-def run_checks(checks, conn):
+def run_checks(checks, conns):
     print('RUNNING CHECKS')
     results = []
 
-    with conn.cursor() as cursor:
-        for check in checks:
+    for check in checks:
+       conn = conns[check['db']]
+       with conn.cursor() as cursor:
             print(check['name'] + '...')
             check_result = run_check(check, cursor)
             result = assemble_result(check, check_result)
             results.append(result)
+
+    #with conn.cursor() as cursor:
+    #    for check in checks:
+    #        print(check['name'] + '...')
+    #        check_result = run_check(check, cursor)
+    #        result = assemble_result(check, check_result)
+    #        results.append(result)
 
     print('DONE')
 
