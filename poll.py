@@ -17,6 +17,7 @@ import jsonschema
 import yaml
 import MySQLdb
 import MySQLdb.cursors
+import libs.db_connections
 
 
 CHECK_SCHEMA = pathlib.Path(__file__).parent / 'schemas' / 'check.json'
