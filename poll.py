@@ -34,7 +34,6 @@ def poll(config_file, checks_file, output_file):
     """
     checks = load_checks(checks_file)
     conns = DBConnections(config_file)
-    #conn = connect_to_db(config_file)
     results = run_checks(checks, conns)
     dump_results(results, output_file)
 
@@ -116,7 +115,7 @@ def get_example(check, cursor):
 def assemble_result(check, check_result):
     return {
         'name': check['name'],
-        'count': check_result.count,
+        'count': json_sanitize(check_result.count),
         'time': check_result.time,
         'example': json_sanitize(check_result.example),
     }
